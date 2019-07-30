@@ -278,6 +278,8 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
         }
     }
 
+    for(auto mesh: mMeshes)
+        mesh->load();
 
     // clean up
     mMeshes.clear();
@@ -1357,6 +1359,14 @@ bool AssimpLoader::createSubMesh(const Ogre::String& name, int index, const aiNo
 
             for (size_t i=0; i < mesh->mNumFaces;++i)
             {
+                    // this is a quick hack to filter lines, which are currently not supported
+                    if(faces->mNumIndices != 3) {
+                            *indexData++ = 0;
+                            *indexData++ = 0;
+                            *indexData++ = 0;
+                            faces++;
+                            continue;
+                    }
                     *indexData++ = faces->mIndices[0];
                     *indexData++ = faces->mIndices[1];
                     *indexData++ = faces->mIndices[2];
@@ -1373,6 +1383,14 @@ bool AssimpLoader::createSubMesh(const Ogre::String& name, int index, const aiNo
 
             for (size_t i=0; i < mesh->mNumFaces;++i)
             {
+                    // this is a quick hack to filter lines, which are currently not supported
+                    if(faces->mNumIndices != 3) {
+                            *indexData++ = 0;
+                            *indexData++ = 0;
+                            *indexData++ = 0;
+                            faces++;
+                            continue;
+                    }
                     *indexData++ = faces->mIndices[0];
                     *indexData++ = faces->mIndices[1];
                     *indexData++ = faces->mIndices[2];
