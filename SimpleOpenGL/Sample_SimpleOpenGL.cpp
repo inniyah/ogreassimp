@@ -415,7 +415,7 @@ void recursive_render (const struct aiScene *sc, const struct aiNode* nd, float 
 
 					if(mesh->HasTextureCoords(0))		//HasTextureCoords(texture_coordinates_set)
 					{
-						glTexCoord2f(mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y); //mTextureCoords[channel][vertex]
+						glTexCoord2f(mesh->mTextureCoords[0][vertexIndex].x, -mesh->mTextureCoords[0][vertexIndex].y); //mTextureCoords[channel][vertex]
 					}
 
 					glNormal3fv(&mesh->mNormals[vertexIndex].x);
