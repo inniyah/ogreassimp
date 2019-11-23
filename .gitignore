@@ -1,0 +1,10 @@
+build/*
+*.kdev4
+CMakeLists.txt.user
+OgreAssimpLoader
+*.o
+*.obj
+*.a
+*.dll
+*.lib
+*~
