@@ -252,7 +252,7 @@ int main(int numargs, char** args)
     }
 
     // Assume success
-	int retCode = 0;
+    int retCode = 0;
 
     try
     {
