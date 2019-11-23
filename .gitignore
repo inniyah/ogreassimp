@@ -3,7 +3,6 @@ build/*
 CMakeLists.txt.user
 OgreAssimpLoader
 *.o
-*.obj
 *.a
 *.dll
 *.lib
