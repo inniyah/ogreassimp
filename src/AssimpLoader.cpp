@@ -8,8 +8,6 @@ This source file is part of
  \___/ \__, |_|  \___|\__,_|___/___/_|_| |_| |_| .__/
        |___/                                   |_|
 
-For the latest info, see https://bitbucket.org/jacmoe/ogreassimp
-
 Copyright (c) 2011 Jacob 'jacmoe' Moen
 
 Licensed under the MIT license:
@@ -33,37 +31,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
 #include "AssimpLoader.h"
-#include "assimp/Importer.hpp"
-//#include "assimp/DefaultLogger.h"
-#include "assimp/DefaultLogger.hpp"
-#include "OgreDataStream.h"
-#include "OgreImage.h"
-#include "OgreTexture.h"
-#include "OgreTextureManager.h"
-#include "OgreMaterial.h"
-#include "OgreMaterialManager.h"
-#include "OgreLog.h"
-#include "OgreLogManager.h"
-#include "OgreHardwareBuffer.h"
-#include "OgreMesh.h"
-#include "OgreSubMesh.h"
-#include "OgreDefaultHardwareBufferManager.h"
-#include "OgreMeshManager.h"
-#include "OgreSceneManager.h"
+
+#include <assimp/Importer.hpp>
+//#include <assimp/DefaultLogger.h>
+#include <assimp/DefaultLogger.hpp>
+#include <OgreDataStream.h>
+#include <OgreImage.h>
+#include <OgreTexture.h>
+#include <OgreTextureManager.h>
+#include <OgreMaterial.h>
+#include <OgreMaterialManager.h>
+#include <OgreLog.h>
+#include <OgreLogManager.h>
+#include <OgreHardwareBuffer.h>
+#include <OgreMesh.h>
+#include <OgreSubMesh.h>
+#include <OgreDefaultHardwareBufferManager.h>
+#include <OgreMeshManager.h>
+#include <OgreSceneManager.h>
 #include <OgreStringConverter.h>
 #include <OgreSkeletonManager.h>
-#include "OgreMeshSerializer.h"
-#include "OgreSkeletonSerializer.h"
-#include "OgreAnimation.h"
-#include "OgreAnimationTrack.h"
-#include "OgreKeyFrame.h"
-#include "OgreLodConfig.h"
-#include "OgreLodStrategyManager.h"
-#include "OgreDistanceLodStrategy.h"
-#include "OgreProgressiveMeshGenerator.h"
+#include <OgreMeshSerializer.h>
+#include <OgreSkeletonSerializer.h>
+#include <OgreAnimation.h>
+#include <OgreAnimationTrack.h>
+#include <OgreKeyFrame.h>
+#include <OgreLodConfig.h>
+#include <OgreLodStrategyManager.h>
+#include <OgreDistanceLodStrategy.h>
+#include <OgreTechnique.h>
+#include <OgreMaterialSerializer.h>
+#include <OgreSkeleton.h>
+#include <OgreBone.h>
+//TOFIX//#include <OgreProgressiveMeshGenerator.h>
 #include <boost/tuple/tuple.hpp>
-//#include "OgreXMLSkeletonSerializer.h"
+//#include <OgreXMLSkeletonSerializer.h>
 
 Ogre::String toString(const aiColor4D& colour)
 {
@@ -173,7 +177,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
 
         if(!mQuietMode)
         {
-            Ogre::LogManager::getSingleton().logMessage("Root bone: " + mSkeleton->getRootBone()->getName());
+            //TOFIX//Ogre::LogManager::getSingleton().logMessage("Root bone: " + mSkeleton->getRootBone()->getName());
         }
 
         unsigned short numBones = mSkeleton->getNumBones();
@@ -184,13 +188,13 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
             assert(pBone);
         }
 
-		if(skeletonPtr)
-			(*skeletonPtr) = mSkeleton;
-		else
-		{
-			Ogre::SkeletonSerializer binSer;
-			binSer.exportSkeleton(mSkeleton.getPointer(), mPath + mBasename + ".skeleton");
-		}
+        if(skeletonPtr)
+            (*skeletonPtr) = mSkeleton;
+        else
+        {
+            Ogre::SkeletonSerializer binSer;
+            binSer.exportSkeleton(mSkeleton.getPointer(), mPath + mBasename + ".skeleton");
+        }
     }
 
     Ogre::MeshSerializer meshSer;
@@ -262,14 +266,14 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
             }
 
             mMesh->setLodStrategy(Ogre::LodStrategyManager::getSingleton().getStrategy(options.lodStrategy));
-            Ogre::ProgressiveMeshGenerator pm;
-            pm.generateLodLevels(lodConfig);
+            //TOFIX//Ogre::ProgressiveMeshGenerator pm;
+            //TOFIX//pm.generateLodLevels(lodConfig);
         }
 
-		if(meshPtr)
-			(*meshPtr) = mMesh;
-		else
-			meshSer.exportMesh(mMesh.getPointer(), mPath + mBasename + ".mesh");
+        if(meshPtr)
+            (*meshPtr) = mMesh;
+        else
+            meshSer.exportMesh(mMesh.getPointer(), mPath + mBasename + ".mesh");
     }
 
 
@@ -308,14 +312,14 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
     }
     else
     {
-		if(!meshPtr)
-		{
-			std::ofstream stream;
-			stream.open( (mPath + mBasename + ".material").c_str(), std::ios::out | std::ios::binary);
-			//stream << "import * from base.material\n\n";
-			stream << mMaterialCode;
-			stream.close();
-		}
+        if(!meshPtr)
+        {
+            std::ofstream stream;
+            stream.open( (mPath + mBasename + ".material").c_str(), std::ios::out | std::ios::binary);
+            //stream << "import * from base.material\n\n";
+            stream << mMaterialCode;
+            stream.close();
+        }
     }
 
 
@@ -619,7 +623,7 @@ void AssimpLoader::parseAnimation (const aiScene* mScene, int index, aiAnimation
             KeyframesMap::iterator it_end = keyframes.end();
             for(it; it != it_end; ++it)
             {
-                if(it->first < cutTime)	// or should it be <=
+                if(it->first < cutTime)    // or should it be <=
                 {
                     aiVector3D aiTrans = getTranslate( node_anim, keyframes, it, mTicksPerSecond);
 
@@ -627,7 +631,7 @@ void AssimpLoader::parseAnimation (const aiScene* mScene, int index, aiAnimation
 
                     aiQuaternion aiRot = getRotate(node_anim, keyframes, it, mTicksPerSecond);
                     Ogre::Quaternion rot(aiRot.w, aiRot.x, aiRot.y, aiRot.z);
-                    Ogre::Vector3 scale(1,1,1);	// ignore scale for now
+                    Ogre::Vector3 scale(1,1,1);    // ignore scale for now
 
                     Ogre::Vector3 transCopy = trans;
 
@@ -635,15 +639,15 @@ void AssimpLoader::parseAnimation (const aiScene* mScene, int index, aiAnimation
                     fullTransform.makeTransform(trans, scale, rot);
 
                     Ogre::Matrix4 poseTokey = defBonePoseInv * fullTransform;
-                    poseTokey.decomposition(trans, scale, rot);
+                    //TOFIX//poseTokey.decomposition(trans, scale, rot);
 
                     keyframe = track->createNodeKeyFrame(Ogre::Real(it->first));
 
                     // weirdness with the root bone, But this seems to work
-                    if(mSkeleton->getRootBone()->getName() == boneName)
-                    {
-                        trans = transCopy - bone->getPosition();
-                    }
+                    //TOFIX//if(mSkeleton->getRootBone()->getName() == boneName)
+                    //TOFIX//{
+                    //TOFIX//    trans = transCopy - bone->getPosition();
+                    //TOFIX//}
 
                     keyframe->setTranslate(trans);
                     keyframe->setRotation(rot);
@@ -940,7 +944,7 @@ Ogre::MaterialPtr AssimpLoader::createMaterialByScript(int index, const aiMateri
         code += "\t\t\temissive " + toString(c) + "\n";
 
     int shade = aiShadingMode_NoShading;
-    if (AI_SUCCESS == mat->Get(AI_MATKEY_SHADING_MODEL, shade) && shade != aiShadingMode_NoShading) { 
+    if (AI_SUCCESS == mat->Get(AI_MATKEY_SHADING_MODEL, shade) && shade != aiShadingMode_NoShading) {
         switch (shade) {
             case aiShadingMode_Phong: // Phong shading mode was added to opengl and directx years ago to be ready for gpus to support it (in fixed function pipeline), but no gpus ever did, so it has never done anything. From directx 10 onwards it was removed again.
             case aiShadingMode_Gouraud:
@@ -1043,7 +1047,7 @@ Ogre::MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat,
     unsigned int uvindex = 0;                             // the texture uv index channel
     float blend = 1.0f;                                   // blend
     aiTextureOp op = aiTextureOp_Multiply;                // op
-    aiTextureMapMode mapmode[3] =  { aiTextureMapMode_Wrap, aiTextureMapMode_Wrap, aiTextureMapMode_Wrap };	// mapmode
+    aiTextureMapMode mapmode[3] =  { aiTextureMapMode_Wrap, aiTextureMapMode_Wrap, aiTextureMapMode_Wrap };    // mapmode
     std::ostringstream texname;
 
     aiString szPath;
@@ -1116,7 +1120,7 @@ Ogre::MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat,
     }
 
     int shade = aiShadingMode_NoShading;
-    if (AI_SUCCESS == mat->Get(AI_MATKEY_SHADING_MODEL, shade) && shade != aiShadingMode_NoShading) { 
+    if (AI_SUCCESS == mat->Get(AI_MATKEY_SHADING_MODEL, shade) && shade != aiShadingMode_NoShading) {
         switch (shade) {
         case aiShadingMode_Phong: // Phong shading mode was added to opengl and directx years ago to be ready for gpus to support it (in fixed function pipeline), but no gpus ever did, so it has never done anything. From directx 10 onwards it was removed again.
         case aiShadingMode_Gouraud:
@@ -1187,7 +1191,7 @@ Ogre::MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat,
             }
         }
 
-		// Ogre::TextureManager::getSingleton().loadImage(Ogre::String(szPath.data), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, image);
+        // Ogre::TextureManager::getSingleton().loadImage(Ogre::String(szPath.data), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, image);
         //TODO: save this to materials/textures ?
         Ogre::TextureUnitState* texUnitState = omat->getTechnique(0)->getPass(0)->createTextureUnitState(basename);
 
@@ -1341,16 +1345,14 @@ bool AssimpLoader::createSubMesh(const Ogre::String& name, int index, const aiNo
             uv++;
         }
 
-        /*
-        if (col)
-        {
-            *vdata++ = col->r;
-            *vdata++ = col->g;
-            *vdata++ = col->b;
-            //*vdata++ = col->a;
-            //col++;
-        }
-        */
+        //if (col)
+        //{
+        //    *vdata++ = col->r;
+        //    *vdata++ = col->g;
+        //    *vdata++ = col->b;
+        //    //*vdata++ = col->a;
+        //    //col++;
+        //}
     }
 
     vbuffer->unlock();

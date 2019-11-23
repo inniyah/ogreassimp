@@ -8,8 +8,6 @@ This source file is part of
  \___/ \__, |_|  \___|\__,_|___/___/_|_| |_| |_| .__/
        |___/                                   |_|
 
-For the latest info, see https://bitbucket.org/jacmoe/ogreassimp
-
 Copyright (c) 2011 Jacob 'jacmoe' Moen
 
 Licensed under the MIT license:
@@ -41,7 +39,7 @@ THE SOFTWARE.
 //#include <assimp/assimp.hpp>
 //#include <assimp/aiScene.h>
 //#include <assimp/aiPostProcess.h>
-#include "assimp/Importer.hpp"
+#include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <map>

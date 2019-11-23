@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include <OgreString.h>
 #include <OgreMeshSerializer.h>
 #include <OgreSkeletonSerializer.h>
+#include <OgreLodStrategyManager.h>
 #include <OgreDefaultHardwareBufferManager.h>
 #if OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)
 #include <OgreProgressiveMesh.h>
