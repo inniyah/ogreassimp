@@ -2,8 +2,10 @@ build/*
 *.kdev4
 CMakeLists.txt.user
 OgreAssimpLoader
+assimp_log.txt
 *.o
 *.a
 *.dll
 *.lib
+*.log
 *~
