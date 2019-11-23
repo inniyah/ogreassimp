@@ -39,8 +39,8 @@ GLuint*		textureIds;							// pointer to texture Array
 Assimp::Importer importer;
 
 // currently these are hardcoded
-static std::string basepath = "./Collada/";
-static std::string modelname = "COLLADA.dae";
+static std::string basepath = "../test/";
+static std::string modelname = "box.obj";
 
 GLfloat LightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f };
 GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
