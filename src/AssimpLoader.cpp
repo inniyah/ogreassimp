@@ -217,10 +217,8 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
             mMesh->setSkeletonName(mBasename + ".skeleton");
         }
 
-        Ogre::Mesh::SubMeshIterator smIt = mMesh->getSubMeshIterator();
-        while (smIt.hasMoreElements())
+        for (auto sm : mMesh->getSubMeshes())
         {
-            Ogre::SubMesh* sm = smIt.getNext();
             if (!sm->useSharedVertices)
             {
 #if (OGRE_VERSION >  ((1 << 16) | (7 << 8) | 0))
@@ -300,10 +298,8 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
 
             // queue up the materials for serialise
             Ogre::MaterialManager *mmptr = Ogre::MaterialManager::getSingletonPtr();
-            Ogre::Mesh::SubMeshIterator smIt = mMesh->getSubMeshIterator();
-            while(smIt.hasMoreElements())
+            for(auto sm : mMesh->getSubMeshes())
             {
-                Ogre::SubMesh* sm = smIt.getNext();
                 Ogre::String matName(sm->getMaterialName());
                 if (std::find(exportedNames.begin(), exportedNames.end(), matName) == exportedNames.end())
                 {
