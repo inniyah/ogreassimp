@@ -73,9 +73,11 @@ THE SOFTWARE.
 #if OGRE_VERSION >= 0x10A01
 #define OGRE_RESET(_sharedPtr) ((_sharedPtr).reset())
 #define OGRE_ISNULL(_sharedPtr) (!(_sharedPtr))
+#define OGRE_STATIC_CAST(_resourcePtr, _castTo) (Ogre::static_pointer_cast<_castTo>(_resourcePtr))
 #else
 #define OGRE_RESET(_sharedPtr) ((_sharedPtr).setNull())
 #define OGRE_ISNULL(_sharedPtr) ((_sharedPtr).isNull())
+#define OGRE_STATIC_CAST(_resourcePtr, _castTo) ((_resourcePtr).staticCast<Ogre::Material>(_castTo))
 #endif
 
 Ogre::String toString(const aiColor4D& colour)
@@ -156,7 +158,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
 #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
         mSkeleton = Ogre::SkeletonManager::getSingleton().create("conversion", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 #else
-        mSkeleton = Ogre::SkeletonManager::getSingleton().create("conversion", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Ogre::Skeleton>();
+        mSkeleton = OGRE_STATIC_CAST(Ogre::SkeletonManager::getSingleton().create("conversion", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME), Ogre::Skeleton);
 #endif
 
         msBoneCount = 0;
@@ -308,7 +310,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
 #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
                     Ogre::MaterialPtr materialPtr = mmptr->getByName(matName);
 #else
-                    Ogre::MaterialPtr materialPtr = mmptr->getByName(matName).staticCast<Ogre::Material>();
+                    Ogre::MaterialPtr materialPtr = OGRE_STATIC_CAST(mmptr->getByName(matName), Ogre::Material);
 #endif
                     ms.queueForExport(materialPtr);
                     exportedNames.push_back(matName);
@@ -929,7 +931,7 @@ Ogre::MaterialPtr AssimpLoader::createMaterialByScript(int index, const aiMateri
 #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
         Ogre::MaterialPtr matPtr = matMgr->getByName(materialName);
 #else
-        Ogre::MaterialPtr matPtr = matMgr->getByName(materialName).staticCast<Ogre::Material>();
+        Ogre::MaterialPtr matPtr = OGRE_STATIC_CAST(matMgr->getByName(materialName), Ogre::Material);
 #endif
         if(matPtr->isLoaded())
         {
@@ -1033,7 +1035,7 @@ Ogre::MaterialPtr AssimpLoader::createMaterialByScript(int index, const aiMateri
 #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
     Ogre::MaterialPtr omat = Ogre::MaterialManager::getSingleton().getByName(materialName);
 #else
-    Ogre::MaterialPtr omat = Ogre::MaterialManager::getSingleton().getByName(materialName).staticCast<Ogre::Material>();
+    Ogre::MaterialPtr omat = OGRE_STATIC_CAST(Ogre::MaterialManager::getSingleton().getByName(materialName), Ogre::Material);
 #endif
     //omat->compile(false);
     //omat->load();
@@ -1089,7 +1091,7 @@ Ogre::MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat,
 #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
     Ogre::MaterialPtr omat = status.first;
 #else
-    Ogre::MaterialPtr omat = status.first.staticCast<Ogre::Material>();
+    Ogre::MaterialPtr omat = OGRE_STATIC_CAST(status.first, Ogre::Material);
 #endif
     if (!status.second)
         return omat;
