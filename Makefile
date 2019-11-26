@@ -9,7 +9,7 @@ PKG_CONFIG_CFLAGS=`pkg-config --cflags $(PKG_CONFIG)`
 PKG_CONFIG_LDFLAGS=`pkg-config --libs-only-L $(PKG_CONFIG)`
 PKG_CONFIG_LIBS=`pkg-config --libs-only-l $(PKG_CONFIG)`
 
-CFLAGS= -Isrc -O2 -g -Wall -Wno-unused-variable -Wno-unused-value
+CFLAGS= -Isrc -O2 -g -Wall -Wno-unused-variable -Wno-unused-value -Wno-unused-but-set-variable
 LDFLAGS= -Wl,--as-needed -Wl,--no-undefined -Wl,--no-allow-shlib-undefined
 LIBS=
 

@@ -65,7 +65,7 @@ THE SOFTWARE.
 #include <OgreMaterialSerializer.h>
 #include <OgreSkeleton.h>
 #include <OgreBone.h>
-//TOFIX//#include <OgreProgressiveMeshGenerator.h>
+//TO_RM//#include <OgreProgressiveMeshGenerator.h>
 #include <boost/tuple/tuple.hpp>
 //#include <OgreXMLSkeletonSerializer.h>
 
@@ -105,8 +105,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
     mLoaderParams = options.params;
     mQuietMode = ((mLoaderParams & LP_QUIET_MODE) == 0) ? false : true;
     mCustomAnimationName = options.customAnimationName;
-    if ((mLoaderParams & LP_USE_LAST_RUN_NODE_DERIVED_TRANSFORMS) == false)
-    {
+    if ((mLoaderParams & LP_USE_LAST_RUN_NODE_DERIVED_TRANSFORMS) == false) {
         mNodeDerivedTransformByName.clear();
     }
 
@@ -114,16 +113,14 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
     Ogre::StringUtil::splitFullFilename(options.source, mBasename, extension, mPath);
     mBasename = mBasename + "_" + extension;
 
-    if(!options.dest.empty())
-    {
+    if(!options.dest.empty()) {
         mPath = options.dest + "/";
     }
 
     Assimp::DefaultLogger::create("asslogger.log",Assimp::Logger::VERBOSE);
     Assimp::DefaultLogger::get()->info("Logging asses");
 
-    if(!mQuietMode)
-    {
+    if(!mQuietMode) {
         Ogre::LogManager::getSingleton().logMessage("*** Loading ass file... ***");
         Ogre::LogManager::getSingleton().logMessage("Filename " + options.source);
     }
@@ -138,10 +135,8 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
     scene = importer.ReadFile(options.source.c_str(), aiProcessPreset_TargetRealtime_Quality | aiProcess_TransformUVCoords | aiProcess_FlipUVs);
 
     // If the import failed, report it
-    if( !scene)
-    {
-        if(!mQuietMode)
-        {
+    if( !scene) {
+        if(!mQuietMode) {
             Ogre::LogManager::getSingleton().logMessage("AssImp importer failed with the following message:");
             Ogre::LogManager::getSingleton().logMessage(importer.GetErrorString() );
         }
@@ -166,10 +161,8 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
         msBoneCount = 0;
         createBoneHiearchy(scene, scene->mRootNode);
 
-        if(scene->HasAnimations())
-        {
-            for(unsigned int i = 0; i < scene->mNumAnimations; ++i)
-            {
+        if(scene->HasAnimations()) {
+            for(unsigned int i = 0; i < scene->mNumAnimations; ++i) {
                 parseAnimation(scene, i, scene->mAnimations[i]);
             }
         }
@@ -177,50 +170,41 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
 
     loadDataFromNode(scene, scene->mRootNode, mPath);
 
-    if(!mQuietMode)
-    {
+    if(!mQuietMode) {
         Ogre::LogManager::getSingleton().logMessage("*** Finished loading ass file ***");
     }
     Assimp::DefaultLogger::kill();
 
-    if(!OGRE_ISNULL(mSkeleton))
-    {
+    if(!OGRE_ISNULL(mSkeleton)) {
 
-        if(!mQuietMode)
-        {
-            //TOFIX//Ogre::LogManager::getSingleton().logMessage("Root bone: " + mSkeleton->getRootBone()->getName());
+        if(!mQuietMode) {
+            //TO_FIX//Ogre::LogManager::getSingleton().logMessage("Root bone: " + mSkeleton->getRootBone()->getName());
         }
 
         unsigned short numBones = mSkeleton->getNumBones();
         unsigned short i;
-        for (i = 0; i < numBones; ++i)
-        {
+        for (i = 0; i < numBones; ++i) {
             Ogre::Bone* pBone = mSkeleton->getBone(i);
             assert(pBone);
         }
 
-        if(skeletonPtr)
+        if (skeletonPtr) {
             (*skeletonPtr) = mSkeleton;
-        else
-        {
+        } else {
             Ogre::SkeletonSerializer binSer;
             binSer.exportSkeleton(mSkeleton.get(), mPath + mBasename + ".skeleton");
         }
     }
 
     Ogre::MeshSerializer meshSer;
-    for(MeshVector::iterator it = mMeshes.begin(); it != mMeshes.end(); ++it)
-    {
+    for(MeshVector::iterator it = mMeshes.begin(); it != mMeshes.end(); ++it) {
         Ogre::MeshPtr mMesh = *it;
-        if(mBonesByName.size())
-        {
+        if(mBonesByName.size()) {
             mMesh->setSkeletonName(mBasename + ".skeleton");
         }
 
-        for (auto sm : mMesh->getSubMeshes())
-        {
-            if (!sm->useSharedVertices)
-            {
+        for (auto sm : mMesh->getSubMeshes()) {
+            if (!sm->useSharedVertices) {
 #if (OGRE_VERSION >  ((1 << 16) | (7 << 8) | 0))
                 Ogre::VertexDeclaration* newDcl =
                     sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(mMesh->hasSkeleton(), mMesh->hasVertexAnimation(), false);
@@ -228,8 +212,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
                 Ogre::VertexDeclaration* newDcl =
                     sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(mMesh->hasSkeleton(), mMesh->hasVertexAnimation());
 #endif
-                if (*newDcl != *(sm->vertexData->vertexDeclaration))
-                {
+                if (*newDcl != *(sm->vertexData->vertexDeclaration)) {
                     // Usages don't matter here since we're only exporting
                     Ogre::BufferUsageList bufferUsages;
                     for (size_t u = 0; u <= newDcl->getMaxSource(); ++u)
@@ -239,8 +222,8 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
             }
         }
 
-        if (options.numLods > 0)
-        {
+/* //TO_RM//
+        if (options.numLods > 0) {
             unsigned short numLod;
             Ogre::LodConfig lodConfig;
             lodConfig.levels.clear();
@@ -255,19 +238,15 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
             lodLevel.reductionMethod = Ogre::LodLevel::VRM_PROPORTIONAL;
 
             numLod = options.numLods;
-            if (options.usePercent)
-            {
+            if (options.usePercent) {
                 lodLevel.reductionMethod = Ogre::LodLevel::VRM_PROPORTIONAL;
                 lodLevel.reductionValue = options.lodPercent * 0.01f;
-            }
-            else
-            {
+            } else {
                 lodLevel.reductionMethod = Ogre::LodLevel::VRM_CONSTANT;
                 lodLevel.reductionValue = (Ogre::Real)options.lodFixed;
             }
             Ogre::Real currDist = 0;
-            for (unsigned short iLod = 0; iLod < numLod; ++iLod)
-            {
+            for (unsigned short iLod = 0; iLod < numLod; ++iLod) {
                 currDist += options.lodValue;
                 Ogre::Real currDistSq = Ogre::Math::Sqr(currDist);
                 lodLevel.distance = currDistSq;
@@ -275,14 +254,16 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
             }
 
             mMesh->setLodStrategy(Ogre::LodStrategyManager::getSingleton().getStrategy(options.lodStrategy));
-            //TOFIX//Ogre::ProgressiveMeshGenerator pm;
-            //TOFIX//pm.generateLodLevels(lodConfig);
+            //TO_RM//Ogre::ProgressiveMeshGenerator pm;
+            //TO_RM//pm.generateLodLevels(lodConfig);
         }
+*/
 
-        if(meshPtr)
+        if(meshPtr) {
             (*meshPtr) = mMesh;
-        else
+        } else {
             meshSer.exportMesh(mMesh.get(), mPath + mBasename + ".mesh");
+        }
     }
 
 
@@ -646,15 +627,14 @@ void AssimpLoader::parseAnimation (const aiScene* mScene, int index, aiAnimation
                     fullTransform.makeTransform(trans, scale, rot);
 
                     Ogre::Matrix4 poseTokey = defBonePoseInv * fullTransform;
-                    //TOFIX//poseTokey.decomposition(trans, scale, rot);
+                    //TO_FIX//poseTokey.decomposition(trans, scale, rot);
 
                     keyframe = track->createNodeKeyFrame(Ogre::Real(it->first));
 
                     // weirdness with the root bone, But this seems to work
-                    //TOFIX//if(mSkeleton->getRootBone()->getName() == boneName)
-                    //TOFIX//{
-                    //TOFIX//    trans = transCopy - bone->getPosition();
-                    //TOFIX//}
+                    //TO_FIX//if(mSkeleton->getRootBone()->getName() == boneName) {
+                    //TO_FIX//    trans = transCopy - bone->getPosition();
+                    //TO_FIX//}
 
                     keyframe->setTranslate(trans);
                     keyframe->setRotation(rot);
