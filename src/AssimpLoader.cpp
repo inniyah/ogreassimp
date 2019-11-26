@@ -204,7 +204,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
         else
         {
             Ogre::SkeletonSerializer binSer;
-            binSer.exportSkeleton(mSkeleton.getPointer(), mPath + mBasename + ".skeleton");
+            binSer.exportSkeleton(mSkeleton.get(), mPath + mBasename + ".skeleton");
         }
     }
 
@@ -282,7 +282,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
         if(meshPtr)
             (*meshPtr) = mMesh;
         else
-            meshSer.exportMesh(mMesh.getPointer(), mPath + mBasename + ".mesh");
+            meshSer.exportMesh(mMesh.get(), mPath + mBasename + ".mesh");
     }
 
 
