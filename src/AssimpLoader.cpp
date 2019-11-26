@@ -69,6 +69,15 @@ THE SOFTWARE.
 #include <boost/tuple/tuple.hpp>
 //#include <OgreXMLSkeletonSerializer.h>
 
+//New shared ptr API introduced in 1.10.1
+#if OGRE_VERSION >= 0x10A01
+#define OGRE_RESET(_sharedPtr) ((_sharedPtr).reset())
+#define OGRE_ISNULL(_sharedPtr) (!(_sharedPtr))
+#else
+#define OGRE_RESET(_sharedPtr) ((_sharedPtr).setNull())
+#define OGRE_ISNULL(_sharedPtr) ((_sharedPtr).isNull())
+#endif
+
 Ogre::String toString(const aiColor4D& colour)
 {
     return Ogre::StringConverter::toString(Ogre::Real(colour.r)) + " " +
@@ -172,7 +181,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
     }
     Assimp::DefaultLogger::kill();
 
-    if(!mSkeleton.isNull())
+    if(!OGRE_ISNULL(mSkeleton))
     {
 
         if(!mQuietMode)
@@ -1428,7 +1437,7 @@ bool AssimpLoader::createSubMesh(const Ogre::String& name, int index, const aiNo
     } // if mesh has bones
 
     // Finally we set a material to the submesh
-    if (!matptr.isNull())
+    if (!OGRE_ISNULL(matptr))
         submesh->setMaterialName(matptr->getName());
 
     return true;
