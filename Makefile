@@ -1,4 +1,4 @@
-PROGRAM=OgreAssimpLoader
+PROGRAM=OgreAssimpConverter
 
 all: $(PROGRAM)
 
@@ -21,6 +21,10 @@ $(PROGRAM): $(OBJS)
 
 %.o: %.c
 	gcc -o $@ -c $+ $(CFLAGS) $(PKG_CONFIG_CFLAGS)
+
+test: $(PROGRAM)
+	@rm -fv */*.material */*.mesh */*.skeleton
+	for F in humanmesh/*.obj; do ./$(PROGRAM) "$$F"; done
 
 clean:
 	@rm -fv *.o *.a *~
