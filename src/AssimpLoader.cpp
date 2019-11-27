@@ -65,7 +65,6 @@ THE SOFTWARE.
 #include <OgreMaterialSerializer.h>
 #include <OgreSkeleton.h>
 #include <OgreBone.h>
-//TO_RM//#include <OgreProgressiveMeshGenerator.h>
 #include <boost/tuple/tuple.hpp>
 //#include <OgreXMLSkeletonSerializer.h>
 
@@ -221,43 +220,6 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
                 }
             }
         }
-
-/* //TO_RM//
-        if (options.numLods > 0) {
-            unsigned short numLod;
-            Ogre::LodConfig lodConfig;
-            lodConfig.levels.clear();
-            lodConfig.mesh = mMesh->clone(mMesh->getName());
-#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
-            lodConfig.strategy = Ogre::DistanceLodStrategy::getSingletonPtr();
-#else
-            lodConfig.strategy = Ogre::DistanceLodBoxStrategy::getSingletonPtr();
-#endif
-
-            Ogre::LodLevel lodLevel;
-            lodLevel.reductionMethod = Ogre::LodLevel::VRM_PROPORTIONAL;
-
-            numLod = options.numLods;
-            if (options.usePercent) {
-                lodLevel.reductionMethod = Ogre::LodLevel::VRM_PROPORTIONAL;
-                lodLevel.reductionValue = options.lodPercent * 0.01f;
-            } else {
-                lodLevel.reductionMethod = Ogre::LodLevel::VRM_CONSTANT;
-                lodLevel.reductionValue = (Ogre::Real)options.lodFixed;
-            }
-            Ogre::Real currDist = 0;
-            for (unsigned short iLod = 0; iLod < numLod; ++iLod) {
-                currDist += options.lodValue;
-                Ogre::Real currDistSq = Ogre::Math::Sqr(currDist);
-                lodLevel.distance = currDistSq;
-                lodConfig.levels.push_back(lodLevel);
-            }
-
-            mMesh->setLodStrategy(Ogre::LodStrategyManager::getSingleton().getStrategy(options.lodStrategy));
-            //TO_RM//Ogre::ProgressiveMeshGenerator pm;
-            //TO_RM//pm.generateLodLevels(lodConfig);
-        }
-*/
 
         if(meshPtr) {
             (*meshPtr) = mMesh;

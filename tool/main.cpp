@@ -67,11 +67,6 @@ void help(void)
     std::cout << "                      by using this option and a prior run with of the model exported as ASE" << std::endl;
     std::cout << "-shader             = create shader based materials" << std::endl;
     std::cout << "-shadows            = set receive shadows = on in material script" << std::endl;
-//TO_RM//    std::cout << "-l lodlevels        = number of LOD levels" << std::endl;
-//TO_RM//    std::cout << "-v lodvalue         = value increment to reduce LOD" << std::endl;
-//TO_RM//    std::cout << "-s lodstrategy      = LOD strategy to use for this mesh" << std::endl;
-//TO_RM//    std::cout << "-p lodpercent       = Percentage triangle reduction amount per LOD" << std::endl;
-//TO_RM//    std::cout << "-f lodnumtris       = Fixed vertex reduction per LOD" << std::endl;
     std::cout << "sourcefile          = name of file to convert" << std::endl;
     std::cout << "destination         = optional name of directory to write to. If you don't" << std::endl;
     std::cout << "                      specify this the converter will use the same directory as the sourcefile."  << std::endl;
@@ -86,11 +81,6 @@ AssimpLoader::AssOptions parseArgs(int numArgs, char **args)
     opts.customAnimationName = "";
     opts.dest = "";
     opts.animationSpeedModifier = 1.0;
-//TO_RM//    opts.lodValue = 250000;
-//TO_RM//    opts.lodFixed = 0;
-//TO_RM//    opts.lodPercent = 20;
-//TO_RM//    opts.numLods = 0;
-//TO_RM//    opts.usePercent = true;
 
     // ignore program name
     char* source = 0;
@@ -107,11 +97,6 @@ AssimpLoader::AssOptions parseArgs(int numArgs, char **args)
     binOpt["-log"] = "ass.log";
     binOpt["-aniName"] = "";
     binOpt["-aniSpeedMod"] = 1.0f;
-//TO_RM//    binOpt["-l"] = "";
-//TO_RM//    binOpt["-v"] = "";
-//TO_RM//    binOpt["-s"] = "Distance";
-//TO_RM//    binOpt["-p"] = "";
-//TO_RM//    binOpt["-f"] = "";
 
     int startIndex = Ogre::findCommandLineOpts(numArgs, args, unOpt, binOpt);
     Ogre::UnaryOptionList::iterator ui;
@@ -155,33 +140,6 @@ AssimpLoader::AssOptions parseArgs(int numArgs, char **args)
     {
         opts.customAnimationName = bi->second;
     }
-//TO_RM//    bi = binOpt.find("-l");
-//TO_RM//    if (!bi->second.empty())
-//TO_RM//    {
-//TO_RM//        opts.numLods = Ogre::StringConverter::parseInt(bi->second);
-//TO_RM//    }
-//TO_RM//    bi = binOpt.find("-v");
-//TO_RM//    if (!bi->second.empty())
-//TO_RM//    {
-//TO_RM//        opts.lodValue = Ogre::StringConverter::parseReal(bi->second);
-//TO_RM//    }
-//TO_RM//    bi = binOpt.find("-s");
-//TO_RM//    if (!bi->second.empty())
-//TO_RM//    {
-//TO_RM//        opts.lodStrategy = bi->second;
-//TO_RM//    }
-//TO_RM//    bi = binOpt.find("-p");
-//TO_RM//    if (!bi->second.empty())
-//TO_RM//    {
-//TO_RM//        opts.lodPercent = Ogre::StringConverter::parseReal(bi->second);
-//TO_RM//        opts.usePercent = true;
-//TO_RM//    }
-//TO_RM//    bi = binOpt.find("-f");
-//TO_RM//    if (!bi->second.empty())
-//TO_RM//    {
-//TO_RM//        opts.lodFixed = Ogre::StringConverter::parseInt(bi->second);
-//TO_RM//        opts.usePercent = false;
-//TO_RM//    }
 
     // Source / dest
     if (numArgs > startIndex)
