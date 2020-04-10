@@ -65,7 +65,7 @@ THE SOFTWARE.
 #include <OgreMaterialSerializer.h>
 #include <OgreSkeleton.h>
 #include <OgreBone.h>
-#include <boost/tuple/tuple.hpp>
+#include <tuple>
 //#include <OgreXMLSkeletonSerializer.h>
 
 //New shared ptr API introduced in 1.10.1
@@ -294,7 +294,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
 }
 
 
-typedef boost::tuple< aiVectorKey*, aiQuatKey*, aiVectorKey* > KeyframeData;
+typedef std::tuple< aiVectorKey*, aiQuatKey*, aiVectorKey* > KeyframeData;
 typedef std::map< Ogre::Real, KeyframeData > KeyframesMap;
 
 template <int v>
@@ -314,7 +314,7 @@ template< typename T > void GetInterpolationIterators(KeyframesMap& keyframes,
     front++;
     for(front; front != keyframes.rend(); front++)
     {
-        if(boost::get< T::value >(front->second) != NULL)
+        if(std::get< T::value >(front->second) != NULL)
         {
             break;
         }
@@ -324,7 +324,7 @@ template< typename T > void GetInterpolationIterators(KeyframesMap& keyframes,
     back++;
     for(back; back != keyframes.end(); back++)
     {
-        if(boost::get< T::value >(back->second) != NULL)
+        if(std::get< T::value >(back->second) != NULL)
         {
             break;
         }
@@ -333,7 +333,7 @@ template< typename T > void GetInterpolationIterators(KeyframesMap& keyframes,
 
 aiVector3D getTranslate(aiNodeAnim* node_anim, KeyframesMap& keyframes, KeyframesMap::iterator it, Ogre::Real ticksPerSecond)
 {
-    aiVectorKey* translateKey = boost::get<0>(it->second);
+    aiVectorKey* translateKey = std::get<0>(it->second);
     aiVector3D vect;
     if(translateKey)
     {
@@ -353,10 +353,10 @@ aiVector3D getTranslate(aiNodeAnim* node_anim, KeyframesMap& keyframes, Keyframe
         aiVectorKey* backKey = NULL;
 
         if(front != rend)
-            frontKey = boost::get<0>(front->second);
+            frontKey = std::get<0>(front->second);
 
         if(back != end)
-            backKey = boost::get<0>(back->second);
+            backKey = std::get<0>(back->second);
 
         // got 2 keys can interpolate
         if(frontKey && backKey)
@@ -381,7 +381,7 @@ aiVector3D getTranslate(aiNodeAnim* node_anim, KeyframesMap& keyframes, Keyframe
 
 aiQuaternion getRotate(aiNodeAnim* node_anim, KeyframesMap& keyframes, KeyframesMap::iterator it, Ogre::Real ticksPerSecond)
 {
-    aiQuatKey* rotationKey = boost::get<1>(it->second);
+    aiQuatKey* rotationKey = std::get<1>(it->second);
     aiQuaternion rot;
     if(rotationKey)
     {
@@ -400,10 +400,10 @@ aiQuaternion getRotate(aiNodeAnim* node_anim, KeyframesMap& keyframes, Keyframes
         aiQuatKey* backKey = NULL;
 
         if(front != rend)
-            frontKey = boost::get<1>(front->second);
+            frontKey = std::get<1>(front->second);
 
         if(back != end)
-            backKey = boost::get<1>(back->second);
+            backKey = std::get<1>(back->second);
 
         // got 2 keys can interpolate
         if(frontKey && backKey)
@@ -548,7 +548,7 @@ void AssimpLoader::parseAnimation (const aiScene* mScene, int index, aiAnimation
                 KeyframesMap::iterator it = keyframes.find((Ogre::Real)node_anim->mRotationKeys[i].mTime / mTicksPerSecond);
                 if(it != keyframes.end())
                 {
-                    boost::get<1>(it->second) = &(node_anim->mRotationKeys[i]);
+                    std::get<1>(it->second) = &(node_anim->mRotationKeys[i]);
                 }
                 else
                 {
@@ -561,7 +561,7 @@ void AssimpLoader::parseAnimation (const aiScene* mScene, int index, aiAnimation
                 KeyframesMap::iterator it = keyframes.find((Ogre::Real)node_anim->mScalingKeys[i].mTime / mTicksPerSecond);
                 if(it != keyframes.end())
                 {
-                    boost::get<2>(it->second) = &(node_anim->mScalingKeys[i]);
+                    std::get<2>(it->second) = &(node_anim->mScalingKeys[i]);
                 }
                 else
                 {
@@ -1197,7 +1197,7 @@ bool AssimpLoader::createSubMesh(const Ogre::String& name, int index, const aiNo
     size_t offset = 0;
     offset += declaration->addElement(source,offset,Ogre::VET_FLOAT3,Ogre::VES_POSITION).getSize();
 
-    //mLog->logMessage((boost::format(" %d vertices ") % m->mNumVertices).str());
+    //mLog->logMessage((std::format(" %d vertices ") % m->mNumVertices).str());
     if(!mQuietMode)
     {
         Ogre::LogManager::getSingleton().logMessage(Ogre::StringConverter::toString(mesh->mNumVertices) + " vertices");
@@ -1208,7 +1208,7 @@ bool AssimpLoader::createSubMesh(const Ogre::String& name, int index, const aiNo
         {
             Ogre::LogManager::getSingleton().logMessage(Ogre::StringConverter::toString(mesh->mNumVertices) + " normals");
         }
-        //mLog->logMessage((boost::format(" %d normals ") % m->mNumVertices).str() );
+        //mLog->logMessage((std::format(" %d normals ") % m->mNumVertices).str() );
         offset += declaration->addElement(source,offset,Ogre::VET_FLOAT3,Ogre::VES_NORMAL).getSize();
     }
 
@@ -1218,7 +1218,7 @@ bool AssimpLoader::createSubMesh(const Ogre::String& name, int index, const aiNo
         {
             Ogre::LogManager::getSingleton().logMessage(Ogre::StringConverter::toString(mesh->mNumVertices) + " uvs");
         }
-        //mLog->logMessage((boost::format(" %d uvs ") % m->mNumVertices).str() );
+        //mLog->logMessage((std::format(" %d uvs ") % m->mNumVertices).str() );
         offset += declaration->addElement(source,offset,Ogre::VET_FLOAT2,Ogre::VES_TEXTURE_COORDINATES).getSize();
     }
 
@@ -1226,7 +1226,7 @@ bool AssimpLoader::createSubMesh(const Ogre::String& name, int index, const aiNo
     if (col)
     {
         Ogre::LogManager::getSingleton().logMessage(Ogre::StringConverter::toString(mesh->mNumVertices) + " colours");
-        //mLog->logMessage((boost::format(" %d colours ") % m->mNumVertices).str() );
+        //mLog->logMessage((std::format(" %d colours ") % m->mNumVertices).str() );
         offset += declaration->addElement(source,offset,Ogre::VET_FLOAT3,Ogre::VES_DIFFUSE).getSize();
     }
     */
