@@ -85,6 +85,43 @@ THE SOFTWARE.
     typedef Ogre::Affine3 Affine3;
 #endif
 
+#include <random>
+#include <sstream>
+
+namespace uuid {
+    static std::random_device              rd;
+    static std::mt19937                    gen(rd());
+    static std::uniform_int_distribution<> dis(0, 15);
+    static std::uniform_int_distribution<> dis2(8, 11);
+
+    std::string generate_uuid_v4() {
+        std::stringstream ss;
+        int i;
+        ss << std::hex;
+        for (i = 0; i < 8; i++) {
+            ss << dis(gen);
+        }
+        ss << "-";
+        for (i = 0; i < 4; i++) {
+            ss << dis(gen);
+        }
+        ss << "-4";
+        for (i = 0; i < 3; i++) {
+            ss << dis(gen);
+        }
+        ss << "-";
+        ss << dis2(gen);
+        for (i = 0; i < 3; i++) {
+            ss << dis(gen);
+        }
+        ss << "-";
+        for (i = 0; i < 12; i++) {
+            ss << dis(gen);
+        };
+        return ss.str();
+    }
+}
+
 Ogre::String toString(const aiColor4D& colour)
 {
     return Ogre::StringConverter::toString(Ogre::Real(colour.r)) + " " +
@@ -1072,7 +1109,7 @@ Ogre::MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat,
         {
             Ogre::LogManager::getSingleton().logMessage("Didn't find any texture units...");
         }
-        szPath = Ogre::String("dummyMat" + Ogre::StringConverter::toString(dummyMatCount)).c_str();
+        szPath = Ogre::String("dummyMat_" + uuid::generate_uuid_v4() + "_" + Ogre::StringConverter::toString(dummyMatCount)).c_str();
         dummyMatCount++;
     }
 
