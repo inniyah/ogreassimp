@@ -79,6 +79,12 @@ THE SOFTWARE.
 #define OGRE_STATIC_CAST(_resourcePtr, _castTo) ((_resourcePtr).staticCast<Ogre::Material>(_castTo))
 #endif
 
+#if OGRE_VERSION < (1 << 16 | 11 << 8 | 0)
+    typedef Ogre::Matrix4 Affine3;
+#else
+    typedef Ogre::Affine3 Affine3;
+#endif
+
 Ogre::String toString(const aiColor4D& colour)
 {
     return Ogre::StringConverter::toString(Ogre::Real(colour.r)) + " " +
@@ -578,7 +584,7 @@ void AssimpLoader::parseAnimation (const aiScene* mScene, int index, aiAnimation
         if(mSkeleton->hasBone(boneName))
         {
             Ogre::Bone* bone = mSkeleton->getBone(boneName);
-            Ogre::Matrix4 defBonePoseInv;
+            Affine3 defBonePoseInv;
             defBonePoseInv.makeInverseTransform(bone->getPosition(), bone->getScale(), bone->getOrientation());
 
             Ogre::NodeAnimationTrack* track = animation->createNodeTrack(i, bone);
@@ -635,11 +641,11 @@ void AssimpLoader::parseAnimation (const aiScene* mScene, int index, aiAnimation
 
                     Ogre::Vector3 transCopy = trans;
 
-                    Ogre::Matrix4 fullTransform;
+                    Affine3 fullTransform;
                     fullTransform.makeTransform(trans, scale, rot);
 
-                    Ogre::Matrix4 poseTokey = defBonePoseInv * fullTransform;
-                    //TO_FIX//poseTokey.decomposition(trans, scale, rot);
+                    Affine3 poseTokey = defBonePoseInv * fullTransform;
+                    poseTokey.decomposition(trans, scale, rot);
 
                     keyframe = track->createNodeKeyFrame(Ogre::Real(it->first));
 
