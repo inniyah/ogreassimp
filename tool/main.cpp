@@ -96,7 +96,7 @@ AssimpLoader::AssOptions parseArgs(int numArgs, char **args)
     unOpt["-shader"] = false;
     binOpt["-log"] = "ass.log";
     binOpt["-aniName"] = "";
-    binOpt["-aniSpeedMod"] = 1.0f;
+    binOpt["-aniSpeedMod"] = "1.0";
 
     int startIndex = Ogre::findCommandLineOpts(numArgs, args, unOpt, binOpt);
     Ogre::UnaryOptionList::iterator ui;
