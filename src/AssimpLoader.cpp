@@ -1109,7 +1109,8 @@ Ogre::MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat,
         {
             Ogre::LogManager::getSingleton().logMessage("Didn't find any texture units...");
         }
-        szPath = Ogre::String("dummyMat_" + uuid::generate_uuid_v4() + "_" + Ogre::StringConverter::toString(dummyMatCount)).c_str();
+        szPath = Ogre::String("dummyMat" +
+            Ogre::StringConverter::toString(dummyMatCount) + "_" + uuid::generate_uuid_v4()).c_str();
         dummyMatCount++;
     }
 
