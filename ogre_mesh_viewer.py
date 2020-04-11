@@ -373,9 +373,13 @@ class MeshViewer(OgreBites.ApplicationContext, OgreBites.InputListener):
 if __name__ == "__main__":
     import argparse
 
+    default_resources = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources.cfg")
+    if not os.path.exists(default_resources):
+        default_resources = None
+
     parser = argparse.ArgumentParser(description="Ogre Mesh Viewer")
     parser.add_argument("meshfile", help="path to a .mesh")
-    parser.add_argument("-c", "--rescfg", help="path to the resources.cfg")
+    parser.add_argument("-c", "--rescfg", help="path to the resources.cfg", default=default_resources)
     args = parser.parse_args() 
     app = MeshViewer(args.meshfile, args.rescfg)
 
