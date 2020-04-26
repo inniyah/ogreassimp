@@ -36,6 +36,10 @@ test: $(PROGRAM)
 	@rm -fv */*.material */*.mesh */*.skeleton
 	for F in humanmesh/*.obj; do ./$(PROGRAM) "$$F"; done
 
+test-lod: $(PROGRAM)
+	@rm -fv */*.material */*.mesh */*.skeleton
+	for F in humanmesh/*.obj; do ./$(PROGRAM) -l 2 "$$F"; done
+
 clean:
 	@rm -fv *.o *.a *~
 	@rm -fv */*.o */*.a */*~

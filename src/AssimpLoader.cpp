@@ -58,9 +58,12 @@ THE SOFTWARE.
 #include <OgreAnimation.h>
 #include <OgreAnimationTrack.h>
 #include <OgreKeyFrame.h>
-#include <OgreLodConfig.h>
-#include <OgreLodStrategyManager.h>
+#include <OgreMeshLodGenerator.h>
 #include <OgreDistanceLodStrategy.h>
+#include <OgreLodStrategyManager.h>
+#include <OgreHardwareVertexBuffer.h>
+#include <OgrePixelCountLodStrategy.h>
+#include <OgreLodConfig.h>
 #include <OgreTechnique.h>
 #include <OgreMaterialSerializer.h>
 #include <OgreSkeleton.h>
@@ -86,6 +89,7 @@ THE SOFTWARE.
 #endif
 
 #include <random>
+#include <iostream>
 #include <sstream>
 
 namespace uuid {
@@ -220,7 +224,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
     if(!OGRE_ISNULL(mSkeleton)) {
 
         if(!mQuietMode) {
-            //TO_FIX//Ogre::LogManager::getSingleton().logMessage("Root bone: " + mSkeleton->getRootBone()->getName());
+            Ogre::LogManager::getSingleton().logMessage("Root bone: " + mSkeleton->getRootBones()[0]->getName());
         }
 
         unsigned short numBones = mSkeleton->getNumBones();
@@ -262,6 +266,50 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
                     sm->vertexData->reorganiseBuffers(newDcl, bufferUsages);
                 }
             }
+        }
+
+        if (options.numLods > 0) {
+            unsigned short numLod;
+            Ogre::LodConfig lodConfig;
+            lodConfig.levels.clear();
+
+            std::vector<Ogre::String> splitMeshName = Ogre::StringUtil::split(mMesh->getName(), "_", 2);
+            Ogre::String newName = splitMeshName[0] + "_" + uuid::generate_uuid_v4();
+            std::cout << Ogre::String("Cloning ") + mMesh->getName() + " as " + newName + "\n";
+
+            lodConfig.mesh = mMesh->clone(newName);
+
+#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+            lodConfig.strategy = Ogre::DistanceLodStrategy::getSingletonPtr();
+#else
+            lodConfig.strategy = Ogre::DistanceLodBoxStrategy::getSingletonPtr();
+#endif
+
+            Ogre::LodLevel lodLevel;
+            lodLevel.reductionMethod = Ogre::LodLevel::VRM_PROPORTIONAL;
+
+            numLod = options.numLods;
+            if (options.usePercent) {
+                lodLevel.reductionMethod = Ogre::LodLevel::VRM_PROPORTIONAL;
+                lodLevel.reductionValue = options.lodPercent * 0.01f;
+            } else {
+                lodLevel.reductionMethod = Ogre::LodLevel::VRM_CONSTANT;
+                lodLevel.reductionValue = (Ogre::Real)options.lodFixed;
+            }
+
+            Ogre::Real currDist = 0;
+            for (unsigned short iLod = 0; iLod < numLod; ++iLod) {
+                currDist += options.lodValue;
+                Ogre::Real currDistSq = Ogre::Math::Sqr(currDist);
+                lodLevel.distance = currDistSq;
+                lodConfig.levels.push_back(lodLevel);
+            }
+
+            mMesh->setLodStrategy(Ogre::LodStrategyManager::getSingleton().getStrategy(options.lodStrategy));
+
+            Ogre::MeshLodGenerator gen;
+            std::cout << "Generating LOD levels\n";
+            gen.generateLodLevels(lodConfig);
         }
 
         if(meshPtr) {
@@ -689,9 +737,9 @@ void AssimpLoader::parseAnimation (const aiScene* mScene, int index, aiAnimation
                     keyframe = track->createNodeKeyFrame(Ogre::Real(it->first));
 
                     // weirdness with the root bone, But this seems to work
-                    //TO_FIX//if(mSkeleton->getRootBone()->getName() == boneName) {
-                    //TO_FIX//    trans = transCopy - bone->getPosition();
-                    //TO_FIX//}
+                    if (mSkeleton->getRootBones()[0]->getName() == boneName) {
+                        trans = transCopy - bone->getPosition();
+                    }
 
                     keyframe->setTranslate(trans);
                     keyframe->setRotation(rot);
@@ -1464,8 +1512,9 @@ bool AssimpLoader::createSubMesh(const Ogre::String& name, int index, const aiNo
     } // if mesh has bones
 
     // Finally we set a material to the submesh
-    if (!OGRE_ISNULL(matptr))
+    if (!OGRE_ISNULL(matptr)) {
         submesh->setMaterialName(matptr->getName());
+    }
 
     return true;
 }
@@ -1481,7 +1530,9 @@ void AssimpLoader::loadDataFromNode(const aiScene* mScene,  const aiNode *pNode,
         {
             if(mMeshes.size() == 0)
             {
-                mesh = Ogre::MeshManager::getSingleton().createManual("ROOTMesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                mesh = Ogre::MeshManager::getSingleton().createManual(
+                    Ogre::String("ROOTMesh") + "_" + uuid::generate_uuid_v4(),
+                    Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
                 mMeshes.push_back(mesh);
             }

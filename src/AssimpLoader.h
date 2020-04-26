@@ -65,6 +65,13 @@ public:
         int params;
         Ogre::Real animationSpeedModifier;
 
+        unsigned short numLods;
+        Ogre::Real lodValue;
+        Ogre::String lodStrategy;
+        Ogre::Real lodPercent;
+        size_t lodFixed;
+        bool usePercent;
+
         AssOptions()
         {
             source = "";
@@ -74,6 +81,13 @@ public:
             customAnimationName = "";
             params = LP_GENERATE_SINGLE_MESH | LP_GENERATE_MATERIALS_AS_CODE;
             animationSpeedModifier = 1.0;
+
+            numLods = 0;
+            lodValue = 250000;
+            lodStrategy = "Distance";
+            lodPercent = 20;
+            lodFixed = 0;
+            usePercent = true;
         };
     };
 
@@ -120,6 +134,7 @@ private:
     void flagNodeAsNeeded(const char* name);
     bool isNodeNeeded(const char* name);
     void parseAnimation (const aiScene* mScene, int index, aiAnimation* anim);
+
     typedef std::map<Ogre::String, boneNode> boneMapType;
     boneMapType boneMap;
     //aiNode* mSkeletonRootNode;
