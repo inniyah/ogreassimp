@@ -246,15 +246,14 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
         } else {
             Ogre::SkeletonSerializer binSer;
             binSer.exportSkeleton(mSkeleton.get(), mPath + mBasename + ".skeleton");
-        }
 
 #ifndef DONT_USE_XML
-        Ogre::XMLSkeletonSerializer xmlSkelSer;
-        xmlSkelSer.exportSkeleton(mSkeleton.get(), mPath + mBasename + ".skeleton.xml");
+            Ogre::XMLSkeletonSerializer xmlSkelSer;
+            xmlSkelSer.exportSkeleton(mSkeleton.get(), mPath + mBasename + ".skeleton.xml");
 #endif // DONT_USE_XML
+        }
     }
 
-    Ogre::MeshSerializer meshSer;
     for(MeshVector::iterator it = mMeshes.begin(); it != mMeshes.end(); ++it) {
         Ogre::MeshPtr mMesh = *it;
         if(mBonesByName.size()) {
@@ -329,13 +328,14 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
         if (meshPtr) {
             (*meshPtr) = mMesh;
         } else {
+            Ogre::MeshSerializer meshSer;
             meshSer.exportMesh(mMesh.get(), mPath + mBasename + ".mesh");
-        }
 
 #ifndef DONT_USE_XML
-    Ogre::XMLMeshSerializer xmlMeshSer;
-    xmlMeshSer.exportMesh(mMesh.get(), mPath + mBasename + ".mesh.xml");
+            Ogre::XMLMeshSerializer xmlMeshSer;
+            xmlMeshSer.exportMesh(mMesh.get(), mPath + mBasename + ".mesh.xml");
 #endif // DONT_USE_XML
+        }
     }
 
     // serialise the materials
