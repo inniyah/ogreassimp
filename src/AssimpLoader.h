@@ -65,12 +65,14 @@ public:
         int params;
         Ogre::Real animationSpeedModifier;
 
+        #ifndef DONT_USE_LOD
         unsigned short numLods;
         Ogre::Real lodValue;
         Ogre::String lodStrategy;
         Ogre::Real lodPercent;
         size_t lodFixed;
         bool usePercent;
+        #endif // DONT_USE_LOD
 
         AssOptions()
         {
@@ -82,12 +84,14 @@ public:
             params = LP_GENERATE_SINGLE_MESH | LP_GENERATE_MATERIALS_AS_CODE;
             animationSpeedModifier = 1.0;
 
+            #ifndef DONT_USE_LOD
             numLods = 0;
             lodValue = 250000;
             lodStrategy = "Distance";
             lodPercent = 20;
             lodFixed = 0;
             usePercent = true;
+            #endif // DONT_USE_LOD
         };
     };
 

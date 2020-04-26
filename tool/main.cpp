@@ -42,11 +42,13 @@ THE SOFTWARE.
 #include <OgreSkeletonSerializer.h>
 #include <OgreLodStrategyManager.h>
 #include <OgreDefaultHardwareBufferManager.h>
-#if OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)
-#include <OgreProgressiveMesh.h>
-#endif
 #include <OgreScriptCompiler.h>
 #include <OgreFileSystem.h>
+
+#ifndef DONT_USE_XML
+#include <OgreXMLMeshSerializer.h>
+#include <OgreXMLSkeletonSerializer.h>
+#endif // DONT_USE_XML
 
 #include "AssimpLoader.h"
 
@@ -68,11 +70,13 @@ void help(void)
     std::cout << "-shader             = create shader based materials" << std::endl;
     std::cout << "-shadows            = set receive shadows = on in material script" << std::endl;
 
+#ifndef DONT_USE_LOD
     std::cout << "-l lodlevels        = number of LOD levels" << std::endl;
     std::cout << "-v lodvalue         = value increment to reduce LOD" << std::endl;
     std::cout << "-s lodstrategy      = LOD strategy to use for this mesh" << std::endl;
     std::cout << "-p lodpercent       = Percentage triangle reduction amount per LOD" << std::endl;
     std::cout << "-f lodnumtris       = Fixed vertex reduction per LOD" << std::endl;
+#endif // DONT_USE_LOD
 
     std::cout << "sourcefile          = name of file to convert" << std::endl;
     std::cout << "destination         = optional name of directory to write to. If you don't" << std::endl;
@@ -89,11 +93,13 @@ AssimpLoader::AssOptions parseArgs(int numArgs, char **args)
     opts.dest = "";
     opts.animationSpeedModifier = 1.0;
 
+#ifndef DONT_USE_LOD
     opts.lodValue = 250000;
     opts.lodFixed = 0;
     opts.lodPercent = 20;
     opts.numLods = 0;
     opts.usePercent = true;
+#endif // DONT_USE_LOD
 
     // ignore program name
     char* source = 0;
@@ -111,11 +117,13 @@ AssimpLoader::AssOptions parseArgs(int numArgs, char **args)
     binOpt["-aniName"] = "";
     binOpt["-aniSpeedMod"] = "1.0";
 
+#ifndef DONT_USE_LOD
     binOpt["-l"] = "";
     binOpt["-v"] = "";
     binOpt["-s"] = "Distance";
     binOpt["-p"] = "";
     binOpt["-f"] = "";
+#endif // DONT_USE_LOD
 
     int startIndex = Ogre::findCommandLineOpts(numArgs, args, unOpt, binOpt);
     Ogre::UnaryOptionList::iterator ui;
@@ -159,6 +167,8 @@ AssimpLoader::AssOptions parseArgs(int numArgs, char **args)
     {
         opts.customAnimationName = bi->second;
     }
+
+#ifndef DONT_USE_LOD
     bi = binOpt.find("-l");
     if (!bi->second.empty())
     {
@@ -186,6 +196,7 @@ AssimpLoader::AssOptions parseArgs(int numArgs, char **args)
         opts.lodFixed = Ogre::StringConverter::parseInt(bi->second);
         opts.usePercent = false;
     }
+#endif // DONT_USE_LOD
 
     // Source / dest
     if (numArgs > startIndex)
@@ -237,9 +248,13 @@ Ogre::LodStrategyManager *lodMgr = 0;
 Ogre::MaterialManager* matMgr = 0;
 Ogre::SkeletonManager* skelMgr = 0;
 Ogre::MeshSerializer* meshSerializer = 0;
-//Ogre::XMLMeshSerializer* xmlMeshSerializer = 0;
 Ogre::SkeletonSerializer* skeletonSerializer = 0;
-//Ogre::XMLSkeletonSerializer* xmlSkeletonSerializer = 0;
+
+#ifndef DONT_USE_XML
+Ogre::XMLMeshSerializer* xmlMeshSerializer = 0;
+Ogre::XMLSkeletonSerializer* xmlSkeletonSerializer = 0;
+#endif // DONT_USE_XML
+
 Ogre::DefaultHardwareBufferManager *bufferManager = 0;
 Ogre::MeshManager* meshMgr = 0;
 Ogre::ResourceGroupManager* rgm = 0;
@@ -281,9 +296,13 @@ int main(int numargs, char** args)
         matMgr->initialise();
         skelMgr = new Ogre::SkeletonManager();
         meshSerializer = new Ogre::MeshSerializer();
-        //xmlMeshSerializer = new Ogre::XMLMeshSerializer();
         skeletonSerializer = new Ogre::SkeletonSerializer();
-        //xmlSkeletonSerializer = new Ogre::XMLSkeletonSerializer();
+
+#ifndef DONT_USE_XML
+        xmlMeshSerializer = new Ogre::XMLMeshSerializer();
+        xmlSkeletonSerializer = new Ogre::XMLSkeletonSerializer();
+#endif // DONT_USE_XML
+
         bufferManager = new Ogre::DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
         scmgr = new Ogre::ScriptCompilerManager();
         archmgr = new Ogre::ArchiveManager();
@@ -306,9 +325,12 @@ int main(int numargs, char** args)
         retCode = 1;
     }
 
-    //delete xmlSkeletonSerializer;
+#ifndef DONT_USE_XML
+    delete xmlSkeletonSerializer;
+    delete xmlMeshSerializer;
+#endif // DONT_USE_XML
+
     delete skeletonSerializer;
-    //delete xmlMeshSerializer;
     delete meshSerializer;
     delete skelMgr;
     delete matMgr;

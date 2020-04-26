@@ -2,9 +2,13 @@ PROGRAM=OgreAssimpConverter
 
 all: $(PROGRAM)
 
-OBJS = src/AssimpLoader.o tool/main.o
+OBJS = \
+	src/AssimpLoader.o \
+	src/OgreXMLMeshSerializer.o \
+	src/OgreXMLSkeletonSerializer.o \
+	tool/main.o
 
-PKG_CONFIG=assimp OGRE OGRE-MeshLodGenerator
+PKG_CONFIG=pugixml assimp OGRE OGRE-MeshLodGenerator
 
 ifndef PKG_CONFIG
 PKG_CONFIG_CFLAGS=
@@ -18,6 +22,7 @@ endif
 
 CFLAGS= -Isrc -O2 -g -Wall -Wno-unused-variable -Wno-unused-value -Wno-unused-but-set-variable
 LDFLAGS= -Wl,--as-needed -Wl,--no-undefined -Wl,--no-allow-shlib-undefined
+INCS=-Isrc
 LIBS=
 DEFS=
 CSTD=-std=c11
@@ -27,10 +32,10 @@ $(PROGRAM): $(OBJS)
 	g++ $(CPPSTD) $(CSTD) $(LDFLAGS) $(PKG_CONFIG_LDFLAGS) $+ -o $@ $(LIBS) $(PKG_CONFIG_LIBS)
 
 %.o: %.cpp
-	g++ -o $@ -c $+ $(CPPSTD) $(DEFS) $(CFLAGS) $(PKG_CONFIG_CFLAGS)
+	g++ -o $@ -c $+ $(CPPSTD) $(DEFS) $(INCS) $(CFLAGS) $(PKG_CONFIG_CFLAGS)
 
 %.o: %.c
-	gcc -o $@ -c $+ $(CSTD) $(DEFS) $(CFLAGS) $(PKG_CONFIG_CFLAGS)
+	gcc -o $@ -c $+ $(CSTD) $(DEFS) $(INCS) $(CFLAGS) $(PKG_CONFIG_CFLAGS)
 
 test: $(PROGRAM)
 	@rm -fv */*.material */*.mesh */*.skeleton

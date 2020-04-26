@@ -58,18 +58,25 @@ THE SOFTWARE.
 #include <OgreAnimation.h>
 #include <OgreAnimationTrack.h>
 #include <OgreKeyFrame.h>
+#include <OgreTechnique.h>
+#include <OgreMaterialSerializer.h>
+#include <OgreSkeleton.h>
+#include <OgreBone.h>
+#include <tuple>
+
+#ifndef DONT_USE_LOD
 #include <OgreMeshLodGenerator.h>
 #include <OgreDistanceLodStrategy.h>
 #include <OgreLodStrategyManager.h>
 #include <OgreHardwareVertexBuffer.h>
 #include <OgrePixelCountLodStrategy.h>
 #include <OgreLodConfig.h>
-#include <OgreTechnique.h>
-#include <OgreMaterialSerializer.h>
-#include <OgreSkeleton.h>
-#include <OgreBone.h>
-#include <tuple>
-//#include <OgreXMLSkeletonSerializer.h>
+#endif // DONT_USE_LOD
+
+#ifndef DONT_USE_XML
+#include <OgreXMLMeshSerializer.h>
+#include <OgreXMLSkeletonSerializer.h>
+#endif // DONT_USE_XML
 
 //New shared ptr API introduced in 1.10.1
 #if OGRE_VERSION >= 0x10A01
@@ -240,6 +247,11 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
             Ogre::SkeletonSerializer binSer;
             binSer.exportSkeleton(mSkeleton.get(), mPath + mBasename + ".skeleton");
         }
+
+#ifndef DONT_USE_XML
+        Ogre::XMLSkeletonSerializer xmlSkelSer;
+        xmlSkelSer.exportSkeleton(mSkeleton.get(), mPath + mBasename + ".skeleton.xml");
+#endif // DONT_USE_XML
     }
 
     Ogre::MeshSerializer meshSer;
@@ -268,6 +280,7 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
             }
         }
 
+#ifndef DONT_USE_LOD
         if (options.numLods > 0) {
             unsigned short numLod;
             Ogre::LodConfig lodConfig;
@@ -311,14 +324,19 @@ bool AssimpLoader::convert(const AssOptions options, Ogre::MeshPtr *meshPtr,  Og
             std::cout << "Generating LOD levels\n";
             gen.generateLodLevels(lodConfig);
         }
+#endif // DONT_USE_LOD
 
-        if(meshPtr) {
+        if (meshPtr) {
             (*meshPtr) = mMesh;
         } else {
             meshSer.exportMesh(mMesh.get(), mPath + mBasename + ".mesh");
         }
-    }
 
+#ifndef DONT_USE_XML
+    Ogre::XMLMeshSerializer xmlMeshSer;
+    xmlMeshSer.exportMesh(mMesh.get(), mPath + mBasename + ".mesh.xml");
+#endif // DONT_USE_XML
+    }
 
     // serialise the materials
     if((mLoaderParams & LP_GENERATE_MATERIALS_AS_CODE) == 0)
