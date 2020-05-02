@@ -133,6 +133,16 @@ namespace uuid {
     }
 }
 
+Ogre::String addUuidToFilename(Ogre::String filename) {
+    Ogre::String basename;
+    Ogre::String extension;
+    Ogre::StringUtil::splitBaseFilename(filename, basename, extension);
+    if (extension.length())
+        return basename + "_" + uuid::generate_uuid_v4() + "." + extension;
+    else
+        return filename + "_" + uuid::generate_uuid_v4();
+}
+
 Ogre::String toString(const aiColor4D& colour)
 {
     return Ogre::StringConverter::toString(Ogre::Real(colour.r)) + " " +
@@ -1110,7 +1120,7 @@ Ogre::MaterialPtr AssimpLoader::createMaterialByScript(int index, const aiMateri
         }
 
         //code += "\tset $diffuse_map " + texName + "\n";
-        code += "\n\t\t\ttexture_unit\n\t\t\t{\n\t\t\t\ttexture " + texName + "\n";
+        code += "\n\t\t\ttexture_unit\n\t\t\t{\n\t\t\t\ttexture " + addUuidToFilename(texName) + "\n";
 
         // no infomation on the alpha channel in the texture will have to load the texture and look at it
         code += "\t\t\t}\n";
@@ -1188,7 +1198,7 @@ Ogre::MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat,
         Ogre::LogManager::getSingleton().logMessage("Creating " + basename);
     }
 
-    Ogre::ResourceManager::ResourceCreateOrRetrieveResult status = omatMgr->createOrRetrieve(ReplaceSpaces(basename), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, true);
+    Ogre::ResourceManager::ResourceCreateOrRetrieveResult status = omatMgr->createOrRetrieve(ReplaceSpaces(addUuidToFilename(basename)), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, true);
 #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
     Ogre::MaterialPtr omat = status.first;
 #else
